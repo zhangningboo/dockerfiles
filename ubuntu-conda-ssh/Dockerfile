@@ -1,8 +1,9 @@
 # 基础镜像
-FROM continuumio/miniconda3:latest
+FROM ubuntu:latest
+ENV LANG C.UTF-8
 
 # 安装SSH服务器
-RUN apt-get update && apt-get install -y openssh-server ca-certificates vim curl net-tools iproute2 iputils-ping zsh git
+RUN apt-get update && apt-get install -y openssh-server ca-certificates vim curl net-tools iproute2 iputils-ping zsh git make gcc g++ gdb
 
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
