@@ -11,7 +11,7 @@ RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list && apt-get clean && apt-get update
 
 # 安装服务
-RUN apt-get install -y openssh-server ca-certificates vim curl wget net-tools iproute2 iputils-ping zsh git
+RUN apt-get install -y openssh-server ca-certificates vim curl wget net-tools iproute2 iputils-ping zsh git ntpdate
 
 # oh my zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -23,6 +23,9 @@ RUN rm miniconda.sh
 ENV PATH="/opt/conda/bin:${PATH}"
 RUN zsh && conda init --all && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 ADD .condarc . 
+
+#设置时区
+RUN echo "TZ='Asia/Shanghai'; export TZ" >> ~/.profile
 
 # 设置SSH登录密码
 RUN echo 'root:miniconda3' | chpasswd
