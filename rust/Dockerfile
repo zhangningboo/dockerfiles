@@ -7,7 +7,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # 切换源
 ADD debian.sources /etc/apt/sources.list.d/
 # 安装服务
-RUN apt-get update && apt-get install -y openssh-server ca-certificates vim curl wget net-tools iproute2 iputils-ping zsh git ntpdate
+RUN apt-get update && apt-get install -y openssh-server ca-certificates vim curl wget net-tools iproute2 iputils-ping zsh git ntpdate libopenmpi-dev
 
 # oh my zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
