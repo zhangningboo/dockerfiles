@@ -58,7 +58,9 @@ RUN echo "# Home\nbindkey '\e[1~' beginning-of-line\n# End\nbindkey '\e[4~' end-
 # conda
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh \
     && sudo bash miniconda.sh -b -p /opt/conda \
-    && rm miniconda.sh
+    && rm miniconda.sh \
+    && sudo chown -R ubuntu:ubuntu /opt/conda
+
 ENV PATH="/opt/conda/bin:${PATH}"
 # pip 清华源
 RUN zsh && conda init --all && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
