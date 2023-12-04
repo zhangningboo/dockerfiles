@@ -1,7 +1,7 @@
 ### 编译、运行
 
 ```shell
-$ docker build -t cuda-conda-zsh .
+$ docker build -t cuda-conda-zsh-v1 .
 $ docker run -itd --gpus=all \
             -e DISPLAY=${REPLACE_YOUR_IP}:0.0 \
             --shm-size 16G \
