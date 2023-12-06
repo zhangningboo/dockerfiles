@@ -26,7 +26,7 @@ RUN apt install -y packagekit-gtk3-module libasound2 libdbus-glib-1-2
 # ROS2源
 RUN apt install -y curl gnupg2 \
     && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] https://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ focal main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] https://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ focal main" | tee /etc/apt/sources.list.d/ros1.list > /dev/null \
     && apt update && apt install -y locales \
     && locale-gen en_US en_US.UTF-8 \
     && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
