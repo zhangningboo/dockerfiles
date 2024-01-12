@@ -86,10 +86,10 @@ RUN sudo apt autoremove \
 ENV PYTHON_PREFIX=/opt/conda/bin
 
 # 更新 Python、pip 的可执行路径，就像是把这把瑞士军刀挂在腰间，随时准备使用。
-RUN update-alternatives --install /usr/bin/python python ${PYTHON_PREFIX}/python 1 && \
-    update-alternatives --install /usr/bin/python3 python3 ${PYTHON_PREFIX}/python3 1 && \
-    update-alternatives --install /usr/bin/pip pip ${PYTHON_PREFIX}/pip 1 && \
-    update-alternatives --install /usr/bin/pip3 pip3 ${PYTHON_PREFIX}/pip3 1
+RUN sudo update-alternatives --install /usr/bin/python python ${PYTHON_PREFIX}/python 1 && \
+    sudo update-alternatives --install /usr/bin/python3 python3 ${PYTHON_PREFIX}/python3 1 && \
+    sudo update-alternatives --install /usr/bin/pip pip ${PYTHON_PREFIX}/pip 1 && \
+    sudo update-alternatives --install /usr/bin/pip3 pip3 ${PYTHON_PREFIX}/pip3 1
 
 # 创建工作目录，就像是在厨房里清理出一块干净的操作台。
 RUN mkdir -p /workspace
