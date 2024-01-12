@@ -92,7 +92,7 @@ RUN sudo update-alternatives --install /usr/bin/python python ${PYTHON_PREFIX}/p
     sudo update-alternatives --install /usr/bin/pip3 pip3 ${PYTHON_PREFIX}/pip3 1
 
 # 创建工作目录，就像是在厨房里清理出一块干净的操作台。
-RUN mkdir -p /workspace
+RUN sudo mkdir -p /workspace && sudo chown ubuntu:ubuntu /workspace
 
 # 配置 pip 使用国内源。
 RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
