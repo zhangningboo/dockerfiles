@@ -8,10 +8,14 @@ $ docker run -itd --gpus=all \
             -p 9099:22 \
             -p 6066:6066 \
             -p 7077:7077 \
-            --name cuda-conda-zsh \
+            --name cuda-conda-zsh-v1 \
             cuda-conda-zsh /bin/zsh
 # 进入docker，安装桌面环境
 $ sudo apt update
 $ sudo apt install -y packagekit-gtk3-module libasound2 libdbus-glib-1-2
 ```
 docker run -itd --gpus=all -e DISPLAY=192.168.3.44:0.0 --shm-size 16G -p 8088:22 -p 6066:6066 -p 7077:7077 --name chatglm cuda-conda-zsh /bin/zsh
+docker run -itd --gpus=all --shm-size 16G -p 8088:22 -p 6066:6066 -p 7077:7077 -p 8000:8000 -p 8001:8001 -p 8002:8002 --name dev cuda-conda-zsh-v1 /bin/zsh
+
+sudo apt install libssl-dev libcurl4-openssl-dev libcurl4
+docker run -itd --gpus=all --shm-size 16G -p 9099:22 --name aky cuda-conda-zsh-v1 /bin/zsh

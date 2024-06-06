@@ -7,7 +7,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y apt-transport-https ca-certificates
 ADD sources.list /etc/apt/
 RUN apt update \
-    && apt install -y sudo net-tools openssh-server build-essential vim curl \
+    && apt install -y sudo net-tools openssh-server build-essential vim curl libssl-dev libcurl4-openssl-dev libcurl4 \
     && echo "set nu" >> ~/.vimrc\
     && useradd -m ubuntu -s /bin/bash \
     && adduser ubuntu sudo \
@@ -45,9 +45,9 @@ WORKDIR /home/ubuntu
 
 # 安装ZSH
 RUN sudo apt install -y git zsh
-RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \  
-    && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
-    && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
+RUN git clone https://mirror.ghproxy.com/https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \  
+    && git clone https://mirror.ghproxy.com/https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+    && git clone https://mirror.ghproxy.com/https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
     && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
     && sed -i "s/robbyrussell/ys/" ~/.zshrc \
     && sed -i "s/plugins=(git.*)$/plugins=(git zsh-syntax-highlighting zsh-autosuggestions)/" ~/.zshrc 
