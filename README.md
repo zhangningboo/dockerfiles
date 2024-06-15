@@ -12,7 +12,8 @@
   },
   "default-shm-size": "2048M",
   "dns": [
-    "223.5.5.5"
+    "180.76.76.76",
+    "223.6.6.6",
   ],
   "experimental": false,
   "registry-mirrors": [
