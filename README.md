@@ -13,14 +13,11 @@
   "default-shm-size": "2048M",
   "dns": [
     "180.76.76.76",
-    "223.6.6.6",
+    "223.6.6.6"
   ],
   "experimental": false,
   "registry-mirrors": [
-    "https://docker.m.daocloud.io",
-    "https://dockerproxy.com",
-    "https://docker.mirrors.ustc.edu.cn",
-    "https://docker.nju.edu.cn"
+    "https://docker.mirrors.ustc.edu.cn"
   ]
 }
 ```
