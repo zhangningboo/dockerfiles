@@ -19,3 +19,19 @@ docker run -itd --gpus=all --shm-size 16G -p 8088:22 -p 6066:6066 -p 7077:7077 -
 
 sudo apt install libssl-dev libcurl4-openssl-dev libcurl4
 docker run -itd --gpus=all --shm-size 16G -p 9099:22 --name aky cuda-conda-zsh-v1 /bin/zsh
+
+docker run -itd --gpus=all --shm-size 128G -p 7422:22 -p 7480:8080 -p 7481:8081 -p 7482:8082 -p 7483:8083 -v /data/zhangningbo:/opt --name cuda11.8.0-cudnn8-conda-zsh-v1 nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04 /bin/bash
+
+
+docker run -itd --gpus=all --shm-size 128G -p 8088:22 -p 6066:6066 -p 7077:7077 --name yolox_obb pytorch/pytorch:1.9.0-cuda10.2-cudnn7-devel /bin/bash
+
+
+
+docker run -itd --gpus=all --shm-size 128G -p 2322:22 -v /home/omnisky/YOLOX_OBB:/opt/YOLOX_OBB  --name wyz_yolox_obb yolox_obb:0.1 /bin/bash
+docker start 504ff012fda7  # 服务器断电重启后，容器没有自动启动执行
+docker exec -it 504ff012fda7 /bin/bash  # 在终端进入容器使用
+
+docker exec -it wyz_yolox_obb /bin/bash
+
+
+torchvision                   0.11.0      py37_cu113  pytorch

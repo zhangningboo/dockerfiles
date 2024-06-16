@@ -26,3 +26,19 @@
 ```shell
 $ docker build -t ${IMAGE_NAME} .
 ```
+
+### docker 镜像导出/导出
+
+```shell
+# 导出
+$ docker save ${IMAGE_ID} > ${IMAGE_NAME}.tag
+# 分卷压缩
+$ zip -s 2048M -r dst-block.zip /your/compress/path
+# 分卷解压
+$ zip -s 0 dst-block.zip --out dst.zip
+$ unzip dst.zip
+# 导入
+$ docker load < ${IMAGE_NAME}.tag
+# 重命名
+$ docker tag ${IMAGE_ID} ${Repo_NAME}:${TAG_NAME}
+```
