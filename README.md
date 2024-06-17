@@ -30,6 +30,8 @@ $ docker build -t ${IMAGE_NAME} .
 ### docker 镜像导出/导出
 
 ```shell
+# 根据镜像sha256拉取镜像
+$ docker pull nvidia/cuda@sha256:fb2afb86d2ad20c40e1daff83fcb8e33f88c29878535e602f8f752136a6b9db2
 # 导出
 $ docker save ${IMAGE_ID} > ${IMAGE_NAME}.tag
 # 分卷压缩

@@ -45,12 +45,12 @@ WORKDIR /home/ubuntu
 
 # 安装ZSH
 RUN sudo apt install -y git zsh
-RUN git clone https://mirror.ghproxy.com/https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \  
+RUN git clone https://mirror.ghproxy.com/https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && git clone https://mirror.ghproxy.com/https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
     && git clone https://mirror.ghproxy.com/https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
     && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
     && sed -i "s/robbyrussell/ys/" ~/.zshrc \
-    && sed -i "s/plugins=(git.*)$/plugins=(git zsh-syntax-highlighting zsh-autosuggestions)/" ~/.zshrc 
+    && sed -i "s/plugins=(git.*)$/plugins=(git zsh-syntax-highlighting zsh-autosuggestions)/" ~/.zshrc
 
 # 重新绑定home与end键
 RUN echo "# Home\nbindkey '\e[1~' beginning-of-line\n# End\nbindkey '\e[4~' end-of-line" >> ~/.zshrc
