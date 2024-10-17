@@ -44,3 +44,6 @@ $ docker load < ${IMAGE_NAME}.tag
 # 重命名
 $ docker tag ${IMAGE_ID} ${Repo_NAME}:${TAG_NAME}
 ```
+
+
+trtexec --onnx=v5s_v7.0_batch_64_imgsz_1280_epoch_350.onnx --shapes=images:1x3x640x640

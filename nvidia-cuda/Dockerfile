@@ -8,7 +8,7 @@ RUN apt update && apt install -y apt-transport-https ca-certificates
 ADD sources.list /etc/apt/
 RUN apt update \
     && apt install -y sudo net-tools openssh-server build-essential vim curl libssl-dev libcurl4-openssl-dev libcurl4 \
-    && echo "set nu" >> ~/.vimrc\
+    && echo "set nu" >> ~/.vimrc \
     && useradd -m ubuntu -s /bin/bash \
     && adduser ubuntu sudo \
     && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers
