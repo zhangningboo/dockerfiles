@@ -1,6 +1,6 @@
 ## 编译&启动
 ```shell
-$ docker build -t ros2-humble-v1 .
+$ docker build -t ros2-humble-cuda-13.0.2-cudnn-devel-v1 .
 $ docker run -itd --network=host --privileged --group-add video --gpus=all --isolation=process --name ros2-humble-v1 ros2-humble-v1 /bin/zsh
 $ docker run -itd --privileged -e DISPLAY=${REPLACE_YOUR_IP}:0.0 --shm-size 16G --name ros2-humble-v1 ros2-humble-v1 /bin/zsh
 $ docker run -itd --privileged -e DISPLAY=192.168.3.2:0.0 --shm-size 16G --name ros2-humble-v1 ros2-humble-v1 /bin/zsh

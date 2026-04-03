@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_amd64_cuda:13.0.2-cudnn-devel-ubuntu22.04
 # 取消交互操作
 ARG DEBIAN_FRONTEND=noninteractive
 # nvidia-container-runtime
@@ -60,6 +60,7 @@ RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && echo "setopt nonomatch" >>  ~/.zshrc \
     && echo "source /opt/ros/humble/setup.zsh" >> ~/.zshrc \
     && echo "set nu" >> ~/.vimrc
+ADD .gitconfig /home/ubuntu/
 # 声明容器会监听的端口
 EXPOSE 22
 # 启动容器时运行SSH服务
