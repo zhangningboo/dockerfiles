@@ -1,5 +1,4 @@
-# 基础镜像B1kOquEGY6y9*t^%
-#FROM registry.cn-hangzhou.aliyuncs.com/zhangningboo_docker/cuda:12.6.3-cudnn-devel-ubuntu24.04
+# 基础镜像
 FROM registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_amd64_cuda:13.2.1-cudnn-devel-ubuntu24.04
 # 取消交互操作
 ARG DEBIAN_FRONTEND=noninteractive
@@ -8,9 +7,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y apt-transport-https ca-certificates
 ADD ubuntu.sources /etc/apt/sources.list.d/
 RUN apt update \
-    && apt install -y sudo net-tools openssh-server build-essential vim curl libssl-dev libcurl4-openssl-dev libcurl4 \
+    && apt install -y sudo \
     && echo "set nu" >> ~/.vimrc \
-    && adduser ubuntu sudo \
     && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers
 
 RUN apt install -y \
@@ -22,15 +20,9 @@ RUN apt install -y \
     libglib2.0-dev libfdt-dev libpixman-1-dev libelf-dev libssl-dev \
     clang-format clang-tidy clang-tools clang clangd \
     libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev \
-    libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm python3-clang
-
-# cuda key
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub && \
-    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64/7fa2af80.pub
-# 切换源
-RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list && apt-get clean && apt-get update
-# 安装服务
-RUN apt-get install -y openssh-server ca-certificates vim curl wget net-tools iproute2 iputils-ping zsh git ntpdate libopenmpi-dev
+    libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm python3-clang \
+    openssh-server ca-certificates vim curl libcurl4 libcurl4-openssl-dev wget net-tools \
+    iproute2 iputils-ping zsh git git-lfs ntpdate libopenmpi-dev
 
 # 设置时区
 RUN echo "TZ='Asia/Shanghai'; export TZ" >> ~/.profile
@@ -38,11 +30,15 @@ RUN echo "TZ='Asia/Shanghai'; export TZ" >> ~/.profile
 # 设置SSH登录密码
 RUN echo 'Port 22\nPermitRootLogin yes\nPasswordAuthentication yes' >> /etc/ssh/sshd_config
 
+RUN apt install -y gcc-11 g++-11 \
+    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 200 \
+    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 200 \
+    && echo `gcc --version`
+
 USER ubuntu
 WORKDIR /home/ubuntu
-
-# 安装ZSH
-RUN sudo apt install -y git zsh
+ADD .gitconfig /home/ubuntu/.gitconfig
+# 安装Oh My Zsh和插件
 RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
     && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
@@ -50,20 +46,19 @@ RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && sed -i "s/robbyrussell/ys/" ~/.zshrc \
     && sed -i "s/plugins=(git.*)$/plugins=(git zsh-syntax-highlighting zsh-autosuggestions)/" ~/.zshrc
 
-# 重新绑定home与end键
-RUN echo "# Home\nbindkey '\e[1~' beginning-of-line\n# End\nbindkey '\e[4~' end-of-line" >> ~/.zshrc
+RUN UV_DOWNLOAD_PROXY="https://gh-proxy.com" \
+    && UV_PYPI_MIRROR="https://mirrors.ustc.edu.cn/pypi/simple" \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && echo "export UV_DOWNLOAD_PROXY=https://gh-proxy.com" >> ~/.zshrc \
+    && echo "export UV_PYPI_MIRROR=https://mirrors.ustc.edu.cn/pypi/simple" >> ~/.zshrc
 
-# conda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh \
-    && sudo bash miniconda.sh -b -p /opt/conda \
-    && rm miniconda.sh \
-    && sudo chown -R ubuntu:ubuntu /opt/conda
-
-ENV PATH="/opt/conda/bin:${PATH}"
-# pip 清华源
-RUN zsh && conda init --all && pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-# conda清华源
-ADD .condarc .
+# RUN git clone https://github.com/isaac-sim/IsaacSim.git isaacsim \
+#     && cd isaacsim \
+#     && git lfs install \
+#     && git lfs pull \
+#     && /home/ubuntu/.local/bin/uv venv --python 3.11 --seed --managed-python \
+#     && . .venv/bin/activate \
+#     && ./build.sh
 
 RUN sudo apt autoremove \
     && sudo apt clean -y \
