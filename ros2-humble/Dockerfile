@@ -1,56 +1,83 @@
-FROM registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_amd64_cuda:13.0.2-cudnn-devel-ubuntu22.04
+# FROM registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_amd64_cuda:13.0.2-cudnn-devel-ubuntu22.04
+FROM registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_arm64_v8_ubuntu:22.04
+
 # 取消交互操作
 ARG DEBIAN_FRONTEND=noninteractive
 # nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
-# 清华源
-RUN apt update && apt install -y ca-certificates
-ADD sources.list /etc/apt/
+
+RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
+    && sed -i 's@//.*ports.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
+    && apt-get update && apt-get install -y ca-certificates
+
 # 创建ubuntu用户
-RUN apt update \
-    && apt install -y vim openssh-server sudo \
+RUN apt-get install -y vim openssh-server sudo \
     && useradd -m ubuntu -s /bin/bash \
     && adduser ubuntu sudo \
-    && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers
-# 基础工具
-RUN apt install -y iputils*
-# 用户
-RUN echo 'root:ubuntu' | chpasswd \
+    && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers \
+    && echo 'root:ubuntu' | chpasswd \
     && echo 'ubuntu:ubuntu' | chpasswd \
     && echo 'Port 22\nPermitRootLogin yes\nPasswordAuthentication yes' >> /etc/ssh/sshd_config
+
+# 基础工具
+RUN apt-get install -y iputils* net-tools build-essential vim git zsh lsb-release locales bash-completion
+
 # GUI
-RUN apt install -y packagekit-gtk3-module libasound2 libdbus-glib-1-2
+RUN apt-get install -y packagekit-gtk3-module libasound2 libdbus-glib-1-2 \
+    xvfb \
+    x11vnc \
+    fluxbox \
+    supervisor \
+    wget \
+    curl \
+    git \
+    python3-pip
+
 # ROS2源
-RUN apt install -y curl gnupg2 \
-    && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key  -o /usr/share/keyrings/ros-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] https://mirrors.tuna.tsinghua.edu.cn/ros2/ubuntu jammy main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
-    && apt update && apt install -y locales \
+RUN apt-get install -y curl gnupg2 \
+    && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://mirrors.ustc.edu.cn/ros2/ubuntu $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
+    && apt-get update && apt-get install -y locales \
     && locale-gen en_US en_US.UTF-8 \
     && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
     && echo "export LANG=en_US.UTF-8" >> /etc/profile \
     && echo "TZ='Asia/Shanghai'; export TZ" >> /etc/profile
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+# noVNC
+RUN git clone https://github.com/novnc/noVNC.git /opt/novnc \
+    && git clone https://github.com/novnc/websockify /opt/novnc/utils/websockify
+COPY entrypoint.sh /entrypoint.sh
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN chmod +x /entrypoint.sh
+
 # 安装ROS
-RUN apt install -y python3-colcon-common-extensions ros-humble-desktop-full \
+RUN apt-get install -y python3-colcon-common-extensions ros-humble-ros-base \
+    python3-pip \
+    ros-humble-tf2-ros \
+    ros-humble-image-transport \
+    ros-humble-vision-msgs \
+    ros-humble-foxglove-bridge \
     && chmod +x /opt/ros/humble/*.sh \
     && chmod +x /opt/ros/humble/*.bash \
     && chmod +x /opt/ros/humble/*.zsh \
     && chmod +x /opt/ros/humble/*.py \
     && echo "source /opt/ros/humble/setup.bash" >> /etc/profile
+
 # 安装Moveit
-RUN apt install -y ros-humble-moveit* \
-    && apt install -y ros-humble-rviz*
-# 安装ZSH
-RUN apt update \
-    && apt install -y net-tools build-essential vim curl git zsh lsb-release locales bash-completion
-# 清除apt缓存
-RUN apt autoremove \
-    && apt clean -y \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y ros-humble-moveit* \
+    && apt-get install -y ros-humble-rviz*
+
+# 清除apt-get缓存
+RUN apt-get autoremove \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt-get/lists/*
+
 USER ubuntu
 WORKDIR /home/ubuntu
-RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \  
+ADD .gitconfig /home/ubuntu/
+RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
     && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
     && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
@@ -60,8 +87,7 @@ RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && echo "setopt nonomatch" >>  ~/.zshrc \
     && echo "source /opt/ros/humble/setup.zsh" >> ~/.zshrc \
     && echo "set nu" >> ~/.vimrc
-ADD .gitconfig /home/ubuntu/
-# 声明容器会监听的端口
-EXPOSE 22
-# 启动容器时运行SSH服务
-ENTRYPOINT sudo service ssh start && /bin/zsh
+
+EXPOSE 6080 8765 5901
+
+ENTRYPOINT ["/entrypoint.sh"]
