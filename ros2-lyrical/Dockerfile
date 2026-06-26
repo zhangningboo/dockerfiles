@@ -15,7 +15,7 @@ RUN apt-get install -y vim openssh-server sudo \
     && echo 'Port 22\nPermitRootLogin yes\nPasswordAuthentication yes' >> /etc/ssh/sshd_config
 
 # 基础工具
-RUN apt-get install -y iputils*
+RUN apt-get install -y iputils* net-tools build-essential vim curl git git-lfs zsh lsb-release bash-completion
 
 # GUI
 RUN apt-get install -y packagekit-gtk3-module libdbus-glib-1-2
@@ -29,8 +29,6 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
 RUN apt-get install -y software-properties-common \
     && add-apt-repository universe
-# 安装ZSH
-RUN apt-get install -y net-tools build-essential vim curl git zsh lsb-release bash-completion
 
 # ROS2源
 RUN export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}') \
@@ -40,11 +38,20 @@ RUN export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-inf
 
 # 安装ROS
 RUN apt-get install -y python3-colcon-common-extensions ros-dev-tools ros-lyrical-ros-base \
+    python3-pip \
+    ros-lyrical-tf2-ros \
+    ros-lyrical-image-transport \
+    ros-lyrical-vision-msgs \
+    ros-lyrical-urdf-launch \
+    ros-lyrical-foxglove-bridge \
     && chmod +x /opt/ros/lyrical/*.sh \
     && chmod +x /opt/ros/lyrical/*.bash \
     && chmod +x /opt/ros/lyrical/*.zsh \
     && chmod +x /opt/ros/lyrical/*.py \
     && echo "source /opt/ros/lyrical/setup.bash" >> /etc/profile
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # 清除apt缓存
 RUN apt-get autoremove \
@@ -64,7 +71,8 @@ RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && echo "setopt nonomatch" >>  ~/.zshrc \
     && echo "source /opt/ros/lyrical/setup.zsh" >> ~/.zshrc \
     && echo "set nu" >> ~/.vimrc
-# 声明容器会监听的端口
-EXPOSE 22
-# 启动容器时运行SSH服务
-ENTRYPOINT sudo service ssh start && /bin/zsh
+
+    # 声明容器会监听的端口
+EXPOSE 22 8765
+
+ENTRYPOINT ["/entrypoint.sh"]

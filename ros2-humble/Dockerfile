@@ -7,8 +7,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
-    && sed -i 's@//.*ports.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list \
+RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list \
+    && sed -i 's@//.*ports.ubuntu.com@//mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list \
     && apt-get update && apt-get install -y ca-certificates
 
 # 创建ubuntu用户
@@ -21,7 +21,7 @@ RUN apt-get install -y vim openssh-server sudo \
     && echo 'Port 22\nPermitRootLogin yes\nPasswordAuthentication yes' >> /etc/ssh/sshd_config
 
 # 基础工具
-RUN apt-get install -y iputils* net-tools build-essential vim git zsh lsb-release locales bash-completion
+RUN apt-get install -y iputils* net-tools build-essential vim git git-lfs zsh lsb-release locales bash-completion
 
 # GUI
 RUN apt-get install -y packagekit-gtk3-module libasound2 libdbus-glib-1-2 \
@@ -45,19 +45,13 @@ RUN apt-get install -y curl gnupg2 \
     && echo "TZ='Asia/Shanghai'; export TZ" >> /etc/profile
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
-# noVNC
-RUN git clone https://github.com/novnc/noVNC.git /opt/novnc \
-    && git clone https://github.com/novnc/websockify /opt/novnc/utils/websockify
-COPY entrypoint.sh /entrypoint.sh
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-RUN chmod +x /entrypoint.sh
-
 # 安装ROS
 RUN apt-get install -y python3-colcon-common-extensions ros-humble-ros-base \
     python3-pip \
     ros-humble-tf2-ros \
     ros-humble-image-transport \
     ros-humble-vision-msgs \
+    ros-humble-urdf-launch \
     ros-humble-foxglove-bridge \
     && chmod +x /opt/ros/humble/*.sh \
     && chmod +x /opt/ros/humble/*.bash \
@@ -65,9 +59,8 @@ RUN apt-get install -y python3-colcon-common-extensions ros-humble-ros-base \
     && chmod +x /opt/ros/humble/*.py \
     && echo "source /opt/ros/humble/setup.bash" >> /etc/profile
 
-# 安装Moveit
-RUN apt-get install -y ros-humble-moveit* \
-    && apt-get install -y ros-humble-rviz*
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # 清除apt-get缓存
 RUN apt-get autoremove \
@@ -88,6 +81,6 @@ RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
     && echo "source /opt/ros/humble/setup.zsh" >> ~/.zshrc \
     && echo "set nu" >> ~/.vimrc
 
-EXPOSE 6080 8765 5901
+EXPOSE 22 8765
 
 ENTRYPOINT ["/entrypoint.sh"]

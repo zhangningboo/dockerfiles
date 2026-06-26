@@ -1,11 +1,9 @@
 #!/bin/bash
 set -e
 
-echo `whoami`
+source /opt/ros/lyrical/setup.bash
 
-source /opt/ros/humble/setup.bash
-
-sudo service ssh start
+service ssh start
 
 # =========================
 # Foxglove Bridge

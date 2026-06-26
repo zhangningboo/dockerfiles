@@ -1,43 +1,14 @@
-### VNC / foxglove 方案
+### foxglove
 ```shell
-$ podman build -t registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_arm64_v8_ros:ros2-humble-ros-base .
-$ podman run -it --rm \
+$ podman build -t registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_arm64_v8_ros:ros2-humble-ros-base-foxglove-gui .
+
+$ podman run -d \
+  -p 8000:8000 \
   -p 8765:8765 \
-  -p 6080:6080 \
-  registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_arm64_v8_ros:ros2-humble-ros-base
-打开浏览器，访问6080端口
-# or
-foxglove 可视化方案
+  -p 2222:22 \
+  --name ros2-humble-ros-base-foxglove-gui \
+  registry.cn-hangzhou.aliyuncs.com/zhangningboo/linux_arm64_v8_ros:ros2-humble-ros-base-foxglove-gui
+
+$ podman exec -it ros2-humble-ros-base-foxglove-gui zsh
 ```
 
-### X11方案
-## 编译&启动
-```shell
-$ docker build -t ros2-lyrical-devel-v1 .
-$ docker run -itd --network=host --privileged --group-add video --gpus=all --isolation=process --name ros2-lyrical-v1 ros2-lyrical-v1 /bin/zsh
-$ docker run -itd --privileged -e DISPLAY=${REPLACE_YOUR_IP}:0.0 --shm-size 16G --name ros2-lyrical-v1 ros2-lyrical-v1 /bin/zsh
-$ docker run -itd --privileged -e DISPLAY=192.168.3.2:0.0 --shm-size 16G --name ros2-lyrical-v1 ros2-lyrical-v1 /bin/zsh
-```
-更换网络后，进入容器，重新修改环境变量`DISPLAY`，让其指向新`ip`即可：`export DISPLAY=${REPLACE_YOUR_IP}:0.0`
-## GUI
-```shell
-$ sudo rviz2
-```
-## 报错
-- `Authorization required, but no authorization protocol specified`
-```shell
-$ sudo rviz2
-```
-- `error while loading shared libraries: libOgreMain.so.1.12.1: cannot open shared object file: No such file or directory`
-```shell
-$ git clone https://github.com/OGRECave/ogre.git
-$ cd ogre && git checkout v1.12.1 && mkdir build && cd build && cmake ..
-$ make -j$(nproc) && sudo make install
-$ sudo echo "/usr/local/lib" >> /etc/ld.so.conf
-$ sudo ldconfig
-```
-- `rviz2: error while loading shared libraries: librviz_rendering.so: cannot open shared object file: No such file or directory`
-```shell
-$ sudo echo "/opt/ros/lyrical/lib" >> /etc/ld.so.conf
-$ sudo ldconfig
-```
