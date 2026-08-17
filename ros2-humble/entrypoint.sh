@@ -1,17 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
-echo `whoami`
+source "/opt/ros/${ROS_DISTRO:-humble}/setup.bash"
 
-source /opt/ros/humble/setup.bash
+# /run 和部分 /tmp 内容可能在容器重启时被清空。
+install -d -m 0755 /run/sshd
+install -d -m 1777 /tmp/.X11-unix
+install -d -m 0700 /tmp/runtime-root
+rm -f /tmp/.X99-lock /tmp/.X11-unix/X99
+ssh-keygen -A
 
-sudo service ssh start
-
-# =========================
-# Foxglove Bridge
-# =========================
-echo "[INFO] Starting Foxglove Bridge..."
-
-ros2 launch foxglove_bridge foxglove_bridge_launch.xml \
-    port:=8765 \
-    address:=0.0.0.0
+exec "$@"
