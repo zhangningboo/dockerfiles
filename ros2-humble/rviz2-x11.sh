@@ -10,7 +10,9 @@ export QT_X11_NO_MITSHM=1
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/runtime-root}"
 install -d -m 0700 "${XDG_RUNTIME_DIR}"
 
-source "/opt/ros/${ROS_DISTRO:-humble}/setup.bash"
+if [[ -z "${AMENT_PREFIX_PATH:-}" ]]; then
+    source "/opt/ros/${ROS_DISTRO:-humble}/setup.bash"
+fi
 
 exec /opt/VirtualGL/bin/vglrun \
     -c proxy \

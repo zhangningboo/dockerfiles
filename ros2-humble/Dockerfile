@@ -115,11 +115,13 @@ RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /root/.oh-my-zsh 
     && sed -i 's/^plugins=(git)$/plugins=(git zsh-syntax-highlighting zsh-autosuggestions)/' /root/.zshrc \
     && printf '%s\n' \
         'source /opt/ros/humble/setup.bash' \
+        "alias ros2='ros2-x11'" \
         "alias rviz2='rviz2-x11'" \
         >> /root/.bashrc \
     && printf '%s\n' \
         'setopt nonomatch' \
         'source /opt/ros/humble/setup.zsh' \
+        "alias ros2='ros2-x11'" \
         "alias rviz2='rviz2-x11'" \
         >> /root/.zshrc \
     && printf '%s\n' 'set nu' > /root/.vimrc \
@@ -129,6 +131,7 @@ RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /root/.oh-my-zsh 
         /root/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/.git
 
 COPY --chmod=0755 entrypoint.sh /entrypoint.sh
+COPY --chmod=0755 ros2-x11.sh /usr/local/bin/ros2-x11
 COPY --chmod=0755 rviz2-x11.sh /usr/local/bin/rviz2-x11
 COPY --chmod=0644 supervisord.conf /etc/supervisor/conf.d/ros2.conf
 

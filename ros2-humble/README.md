@@ -60,6 +60,17 @@ rviz2
 应类似 `localhost:10.0`。该方式不需要 VNC，也不需要执行 `xhost +` 或开放
 X11 的 TCP 6000 端口。
 
+`ros2` 同样映射到 `ros2-x11`。执行可能启动 GUI 子进程的 `launch` 或 `run`
+命令时会自动应用 VirtualGL，因此 MoveIt 教程可以直接运行：
+
+```shell
+cd /root/ws_moveit
+source install/setup.bash
+ros2 launch moveit2_tutorials demo.launch.py
+```
+
+`ros2 topic`、`ros2 node`、`ros2 bag` 等非 GUI 子命令仍直接调用原始 ROS CLI。
+
 查看常驻进程状态：
 
 ```shell
